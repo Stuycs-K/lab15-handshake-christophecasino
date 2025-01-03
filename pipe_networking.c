@@ -4,13 +4,27 @@
 /*=========================
   server_setup
 
-  creates the WKP and opens it, waiting for a  connection.
+  creates the WKP and opens it, waiting for a connection.
   removes the WKP once a connection has been made
 
   returns the file descriptor for the upstream pipe.
   =========================*/
 int server_setup() {
   int from_client = 0;
+  char path[] = "/tmp/mario";
+  char private[100];
+  int n = mkfifo(path, 0777);
+  if(n == -1) {
+    printf("%s\n",strerror(errno));
+    exit(1);
+  }
+  int fd = open(path, O_RDONLY);
+  if(fd == -1) {
+    printf("%s\n",strerror(errno));
+    exit(1);
+  }
+  read(fd, private, sizeof(private));
+  printf("%s\n", private);
   return from_client;
 }
 
@@ -40,6 +54,17 @@ int server_handshake(int *to_client) {
   =========================*/
 int client_handshake(int *to_server) {
   int from_server;
+  char path[] = "/tmp/mario";
+
+  // Create a Private Pipe.
+
+  // Open Well Known Pipe to server and send the .
+  int fd = open(path, O_WRONLY);
+  if(fd == -1) {
+    printf("%s\n",strerror(errno));
+    exit(1);
+  }
+  write(fd, "private", 7);
   return from_server;
 }
 
