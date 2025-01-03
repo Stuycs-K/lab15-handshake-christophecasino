@@ -26,7 +26,7 @@ int server_setup() {
   }
   read(fd, private, sizeof(private));
   sscanf(private, "%d", &from_client);
-  remove(path);
+
   return from_client;
 }
 
@@ -57,10 +57,14 @@ int server_handshake(int *to_client) {
   write(fd, acknowledgement, sizeof(acknowledgement));
 
   // Get second acknowlegdment.
+  char ack[100];
+  int fd = open(path, O_RDONLY);
+  if(fd == -1) {
+    printf("%s\n",strerror(errno));
+    exit(1);
+  }
+  read(fd, ack, sizeof(ack));
   
-
-  
-
   return from_client;
 }
 
@@ -102,6 +106,26 @@ int client_handshake(int *to_server) {
 
   // Send file descriptor of Private Pipe to the server via WKP.
   write(fd, private_pid, sizeof(private_pid));
+
+  // Wait for syn_ack from server on Private Pipe.
+  int df = open(private_path, O_RDONLY);
+  if(df == -1) {
+    printf("%s\n",strerror(errno));
+    exit(1);
+  }
+  remove(private_path);
+  char syn_ack[100];
+  read(df, syn_ack, sizeof(syn_ack));
+  printf("syn_ack %s\n", syn_ack);
+
+  // Send ack to server on WKP with pid+1.
+  int change_num;
+  sscanf(syn_ack, "%d", &change_num);
+  change_num++;
+  char ack[100];
+  sprintf(ack, "%d", change_num);
+  write(fd, ack, sizeof(ack));
+  
   return from_server;
 }
 
