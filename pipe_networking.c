@@ -59,7 +59,7 @@ int server_handshake(int *to_client) {
 
   // Get second acknowlegdment.
   char ack[100];
-  // char path[] = "/tmp/mario";
+  char path[] = "/tmp/mario";
   // int n = mkfifo(path, 0777);
   // if(n == -1) {
   //   printf("%s\n",strerror(errno));
@@ -130,7 +130,7 @@ int client_handshake(int *to_server) {
   sscanf(syn_ack, "%d", &change_num);
   change_num++;
   char ack[100];
-  sprintf(ack, "%d\0", change_num);
+  sprintf(ack, "%d\n", change_num);
   write(fd, ack, sizeof(ack));
   
   return from_server;
