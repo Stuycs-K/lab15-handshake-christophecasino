@@ -71,7 +71,7 @@ int server_handshake(int *to_client) {
     exit(1);
   }
   read(df, ack, sizeof(ack));
-  printf("ack %d\n", ack);
+  printf("ack %s\n", ack);
   
   return from_client;
 }
@@ -112,6 +112,7 @@ int client_handshake(int *to_server) {
   }
 
   // Send file descriptor of Private Pipe to the server via WKP.
+  printf("syn %s\n", private_pid);
   write(fd, private_pid, sizeof(private_pid));
 
   // Wait for syn_ack from server on Private Pipe.
