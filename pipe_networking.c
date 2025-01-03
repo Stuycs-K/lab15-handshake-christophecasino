@@ -13,6 +13,7 @@ int server_setup() {
   int from_client = 0;
   char path[] = "/tmp/mario";
   char private[100];
+  remove(path);
   int n = mkfifo(path, 0777);
   if(n == -1) {
     printf("%s\n",strerror(errno));
@@ -24,7 +25,7 @@ int server_setup() {
     exit(1);
   }
   read(fd, private, sizeof(private));
-  printf("%s\n", private);
+  sscanf(private, "%d", &from_client);
   return from_client;
 }
 
@@ -54,17 +55,31 @@ int server_handshake(int *to_client) {
   =========================*/
 int client_handshake(int *to_server) {
   int from_server;
-  char path[] = "/tmp/mario";
+  char WKP_path[] = "/tmp/mario";
 
-  // Create a Private Pipe.
-
-  // Open Well Known Pipe to server and send the .
-  int fd = open(path, O_WRONLY);
+  // Open Well Known Pipe to server.
+  int fd = open(WKP_path, O_WRONLY);
   if(fd == -1) {
     printf("%s\n",strerror(errno));
     exit(1);
   }
-  write(fd, "private", 7);
+
+  // Create a Private Pipe.
+  int pid = getpid();
+  char path_prefix[100] = "/tmp/";
+  char path[100];
+  char private_pipe[100];
+  sprintf(private_pipe, "%d", pid);
+  sprintf(path, "%s%d", path_prefix, pid);
+  remove(path);
+  int n = mkfifo(path, 0777);
+  if(n == -1) {
+    printf("%s\n",strerror(errno));
+    exit(1);
+  }
+
+  // Send file descriptor of Private Pipe to the server via WKP.
+  write(fd, private_pipe, sizeof(private_pipe));
   return from_server;
 }
 
