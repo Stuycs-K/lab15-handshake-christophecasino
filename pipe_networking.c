@@ -67,19 +67,19 @@ int client_handshake(int *to_server) {
   // Create a Private Pipe.
   int pid = getpid();
   char path_prefix[100] = "/tmp/";
-  char path[100];
-  char private_pipe[100];
-  sprintf(private_pipe, "%d", pid);
-  sprintf(path, "%s%d", path_prefix, pid);
-  remove(path);
-  int n = mkfifo(path, 0777);
+  char private_path[100];
+  char private_pid[100];
+  sprintf(private_pid, "%d", pid);
+  sprintf(private_path, "%s%d", path_prefix, pid);
+  remove(private_path);
+  int n = mkfifo(private_path, 0777);
   if(n == -1) {
     printf("%s\n",strerror(errno));
     exit(1);
   }
 
   // Send file descriptor of Private Pipe to the server via WKP.
-  write(fd, private_pipe, sizeof(private_pipe));
+  write(fd, private_pid, sizeof(private_pid));
   return from_server;
 }
 
