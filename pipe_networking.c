@@ -130,7 +130,7 @@ int client_handshake(int *to_server) {
   sscanf(syn_ack, "%d", &change_num);
   change_num++;
   char ack[100];
-  sprintf(ack, "%d\n", change_num);
+  sprintf(ack, "%d", change_num);
   write(fd, ack, sizeof(ack));
   
   return from_server;
