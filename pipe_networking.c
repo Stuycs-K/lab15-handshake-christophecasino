@@ -24,11 +24,10 @@ int server_setup() {
     printf("%s\n",strerror(errno));
     exit(1);
   }
-  remove(path);
+  //remove(path);
   read(fd, private, sizeof(private));
   close(fd);
   sscanf(private, "%d", &from_client);
-
   return from_client;
 }
 
@@ -59,13 +58,13 @@ int server_handshake(int *to_client) {
   write(fd, syn_ack, sizeof(syn_ack));
 
   // Get second acknowlegdment.
-  char path[] = "/tmp/mario";
   char ack[100];
-  int n = mkfifo(path, 0777);
-  if(n == -1) {
-    printf("%s\n",strerror(errno));
-    exit(1);
-  }
+  // char path[] = "/tmp/mario";
+  // int n = mkfifo(path, 0777);
+  // if(n == -1) {
+  //   printf("%s\n",strerror(errno));
+  //   exit(1);
+  // }
   int df = open(path, O_RDONLY);
   if(df == -1) {
     printf("%s\n",strerror(errno));
