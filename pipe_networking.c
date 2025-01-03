@@ -26,6 +26,7 @@ int server_setup() {
   }
   read(fd, private, sizeof(private));
   sscanf(private, "%d", &from_client);
+  remove(path);
   return from_client;
 }
 
@@ -40,6 +41,26 @@ int server_setup() {
   =========================*/
 int server_handshake(int *to_client) {
   int from_client;
+
+  // Open Private Pipe to client.
+  char path_prefix[100] = "/tmp/";
+  char private_path[100];
+  sprintf(private_path, "%s%d", path_prefix, *to_client);
+  int fd = open(private_path, O_WRONLY);
+  if(fd == -1) {
+    printf("%s\n",strerror(errno));
+    exit(1);
+  }
+
+  // Send acknowledgement of connection through Private Pipe.
+  char acknowledgement[10]= "123";
+  write(fd, acknowledgement, sizeof(acknowledgement));
+
+  // Get second acknowlegdment.
+  
+
+  
+
   return from_client;
 }
 
@@ -66,6 +87,7 @@ int client_handshake(int *to_server) {
 
   // Create a Private Pipe.
   int pid = getpid();
+  printf("%d\n", pid);
   char path_prefix[100] = "/tmp/";
   char private_path[100];
   char private_pid[100];
