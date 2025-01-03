@@ -26,6 +26,7 @@ int server_setup() {
   }
   //remove(path);
   read(fd, private, sizeof(private));
+  printf("syn %s\n", private);
   close(fd);
   sscanf(private, "%d", &from_client);
   return from_client;
@@ -42,6 +43,7 @@ int server_setup() {
   =========================*/
 int server_handshake(int *to_client) {
   int from_client;
+  srand(time(NULL));
 
   // Open Private Pipe to client.
   char path_prefix[100] = "/tmp/";
@@ -54,7 +56,9 @@ int server_handshake(int *to_client) {
   }
 
   // Send acknowledgement of connection through Private Pipe.
-  char syn_ack[10]= "123";
+  int random = (rand() % 100000);
+  char syn_ack[20];
+  sprintf(syn_ack, "%d", random);
   write(fd, syn_ack, sizeof(syn_ack));
 
   // Get second acknowlegdment.
@@ -112,7 +116,6 @@ int client_handshake(int *to_server) {
   }
 
   // Send file descriptor of Private Pipe to the server via WKP.
-  printf("syn %s\n", private_pid);
   write(fd, private_pid, sizeof(private_pid));
 
   // Wait for syn_ack from server on Private Pipe.
