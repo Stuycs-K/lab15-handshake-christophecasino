@@ -24,7 +24,9 @@ int server_setup() {
     printf("%s\n",strerror(errno));
     exit(1);
   }
+  remove(path);
   read(fd, private, sizeof(private));
+  close(fd);
   sscanf(private, "%d", &from_client);
 
   return from_client;
@@ -53,17 +55,24 @@ int server_handshake(int *to_client) {
   }
 
   // Send acknowledgement of connection through Private Pipe.
-  char acknowledgement[10]= "123";
-  write(fd, acknowledgement, sizeof(acknowledgement));
+  char syn_ack[10]= "123";
+  write(fd, syn_ack, sizeof(syn_ack));
 
   // Get second acknowlegdment.
+  char path[] = "/tmp/mario";
   char ack[100];
-  int fd = open(path, O_RDONLY);
-  if(fd == -1) {
+  int n = mkfifo(path, 0777);
+  if(n == -1) {
     printf("%s\n",strerror(errno));
     exit(1);
   }
-  read(fd, ack, sizeof(ack));
+  int df = open(path, O_RDONLY);
+  if(df == -1) {
+    printf("%s\n",strerror(errno));
+    exit(1);
+  }
+  read(df, ack, sizeof(ack));
+  printf("ack %d\n", ack);
   
   return from_client;
 }
@@ -91,7 +100,6 @@ int client_handshake(int *to_server) {
 
   // Create a Private Pipe.
   int pid = getpid();
-  printf("%d\n", pid);
   char path_prefix[100] = "/tmp/";
   char private_path[100];
   char private_pid[100];
@@ -123,7 +131,7 @@ int client_handshake(int *to_server) {
   sscanf(syn_ack, "%d", &change_num);
   change_num++;
   char ack[100];
-  sprintf(ack, "%d", change_num);
+  sprintf(ack, "%d\0", change_num);
   write(fd, ack, sizeof(ack));
   
   return from_server;
