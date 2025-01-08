@@ -12,7 +12,6 @@
 int server_setup() {
   int from_client = 0;
   char path[] = "/tmp/mario";
-  char private[100];
   remove(path);
   int n = mkfifo(path, 0777);
   if(n == -1) {
@@ -24,9 +23,7 @@ int server_setup() {
     printf("%s\n",strerror(errno));
     exit(1);
   }
-  read(fd, private, sizeof(private));
-  printf("syn %s\n", private);
-  sscanf(private, "%d", &from_client);
+  from_client = fd;
   return from_client;
 }
 
@@ -43,15 +40,23 @@ int server_handshake(int *to_client) {
   int from_client;
   srand(time(NULL));
 
+  // Get client pid.
+  char private[100];
+  int private_pipe_PID;
+  read(*to_client, private, sizeof(private));
+  printf("syn %s\n", private);
+  sscanf(private, "%d", &private_pipe_PID);
+
   // Open Private Pipe to client.
   char path_prefix[100] = "/tmp/";
   char private_path[100];
-  sprintf(private_path, "%s%d", path_prefix, *to_client);
+  sprintf(private_path, "%s%d", path_prefix, private_pipe_PID);
   int fd = open(private_path, O_WRONLY);
   if(fd == -1) {
     printf("%s\n",strerror(errno));
     exit(1);
   }
+  *to_client = fd;
 
   // Send acknowledgement of connection through Private Pipe.
   int random = (rand() % 100000);
@@ -70,7 +75,7 @@ int server_handshake(int *to_client) {
   read(df, ack, sizeof(ack));
   printf("ack %s\n", ack);
   
-  from_client = fd;
+  from_client = df;
   return from_client;
 }
 
