@@ -10,7 +10,7 @@ int main() {
   from_client = server_handshake( &to_client );
   char path_prefix[100] = "/tmp/";
   char private_path[100];
-  sprintf(private_path, "%s%d", path_prefix, *to_client);
+  sprintf(private_path, "%s%d", path_prefix, to_client);
   int fd = open(private_path, O_WRONLY);
   if(fd == -1) {
     printf("%s\n",strerror(errno));
