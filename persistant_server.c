@@ -26,12 +26,12 @@ int main() {
       char sent_int[20];
       sprintf(sent_int, "%d", random);
       int n = write(to_client, sent_int, sizeof(sent_int));
-      if(n < 0){
-        close(to_client);
-        to_client = WKPfd;
-        printf("SERVER BREAK\n");
-        break;
-      }
+      // if(n < 0){
+      //   close(to_client);
+      //   to_client = WKPfd;
+      //   printf("SERVER BREAK\n");
+      //   break;
+      // }
       sleep(1);
     }
   }
