@@ -26,7 +26,6 @@ int server_setup() {
   }
   read(fd, private, sizeof(private));
   printf("syn %s\n", private);
-  close(fd);
   sscanf(private, "%d", &from_client);
   return from_client;
 }
@@ -71,6 +70,7 @@ int server_handshake(int *to_client) {
   read(df, ack, sizeof(ack));
   printf("ack %s\n", ack);
   
+  from_client = fd;
   return from_client;
 }
 
