@@ -24,7 +24,6 @@ int server_setup() {
     printf("%s\n",strerror(errno));
     exit(1);
   }
-  //remove(path);
   read(fd, private, sizeof(private));
   printf("syn %s\n", private);
   close(fd);
@@ -64,11 +63,6 @@ int server_handshake(int *to_client) {
   // Get second acknowlegdment.
   char ack[100];
   char path[] = "/tmp/mario";
-  // int n = mkfifo(path, 0777);
-  // if(n == -1) {
-  //   printf("%s\n",strerror(errno));
-  //   exit(1);
-  // }
   int df = open(path, O_RDONLY);
   if(df == -1) {
     printf("%s\n",strerror(errno));
@@ -137,6 +131,7 @@ int client_handshake(int *to_server) {
   sprintf(ack, "%d", change_num);
   write(fd, ack, sizeof(ack));
   
+  from_server = df;
   return from_server;
 }
 
