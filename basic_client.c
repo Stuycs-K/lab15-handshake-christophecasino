@@ -1,6 +1,21 @@
 #include "pipe_networking.h"
 
+static void sighandler(int signo){
+  if(signo == SIGINT){
+    char path_prefix[100] = "/tmp/";
+    char private_path[100];
+    char private_pid[100];
+    int pid = getpid();
+    sprintf(private_pid, "%d", pid);
+    sprintf(private_path, "%s%d", path_prefix, pid);
+    remove(private_path);
+    printf("CLIENT SIGINT");
+    exit(0);
+  }
+}
+
 int main() {
+  signal(SIGINT, sighandler);
 
   int to_server;
   int from_server;
