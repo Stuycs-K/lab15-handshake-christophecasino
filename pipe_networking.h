@@ -25,6 +25,7 @@
 
 
 int server_handshake(int *to_client);
+int server_handshake_half(int *to_client);
 int client_handshake(int *to_server);
 
 //for basic & persistent servers
