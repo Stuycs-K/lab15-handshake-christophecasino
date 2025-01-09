@@ -36,7 +36,7 @@ int server_setup() {
 
   returns the file descriptor for the upstream pipe (see server setup).
   =========================*/
-int server_handshake(int *to_client) {
+int server_handshake_half(int *to_client) {
   int from_client;
   srand(time(NULL));
 
@@ -77,6 +77,10 @@ int server_handshake(int *to_client) {
   
   from_client = df;
   return from_client;
+}
+
+int server_handshake(int *to_client) {
+  server_handshake_half(to_client);
 }
 
 
