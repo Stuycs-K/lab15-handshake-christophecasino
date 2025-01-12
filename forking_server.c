@@ -22,19 +22,27 @@ int main() {
   while(1){
     to_client = server_setup();
     WKPfd = to_client;
-    from_client = server_handshake( &to_client );
+    pid_t p;
+    p = fork();
+    if(p<0){
+      perror("fork fail");
+      exit(1);
+    } else {
+      from_client = server_handshake( &to_client );
 
-    while(1){
-      int random = (rand() % 101);
-      char sent_int[20];
-      sprintf(sent_int, "%d", random);
-      int n = write(to_client, sent_int, sizeof(sent_int));
-      if(n < 0){
-        close(to_client);
-        to_client = WKPfd;
-        break;
+      while(1){
+        int random = (rand() % 101);
+        char sent_int[20];
+        sprintf(sent_int, "%d", random);
+        int n = write(to_client, sent_int, sizeof(sent_int));
+        if(n < 0){
+          close(to_client);
+          to_client = WKPfd;
+          break;
+        }
+        sleep(1);
       }
-      sleep(1);
+      exit(0);
     }
   }
 }
