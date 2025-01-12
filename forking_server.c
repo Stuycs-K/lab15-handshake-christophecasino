@@ -14,10 +14,10 @@ static void sighandler(int signo){
 int main() {
   signal(SIGINT, sighandler);
   signal(SIGPIPE, sighandler);
-  srand(time(NULL));
   int to_client; // Private
   int from_client; // WKP
   int WKPfd;
+  srand(time(NULL));
 
   while(1){
     to_client = server_setup();
@@ -27,7 +27,8 @@ int main() {
     if(p<0){
       perror("fork fail");
       exit(1);
-    } else {
+    } else if (p == 0){
+      srand(time(NULL));
       from_client = server_handshake( &to_client );
 
       while(1){
@@ -43,6 +44,8 @@ int main() {
         sleep(1);
       }
       exit(0);
+    } else {
+      sleep(1);
     }
   }
 }
